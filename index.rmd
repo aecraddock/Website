@@ -1,0 +1,156 @@
+---
+title: "SQL"
+author: "Adam Craddock"
+date: "December 14, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Filtering Columns & Rows
+
+In SQL you can filter columns and rows using SELECT and WHERE to find rows. Using the Lahman baseball database, we will provide an example.
+
+First, download the needed packages written below.
+
+
+```{r}
+library(Lahman)
+library(sqldf)
+
+```
+
+Next, the example, suppose we wanted to see the total HR totals for the 1927 Yankees. The code for this would be:
+
+```{r}
+query<-"SELECT playerID,teamID,yearID,HR FROM Batting WHERE teamID='NYA' and yearID=1927"
+
+sqldf(query)
+
+
+```
+
+Getting a bit more specific, this is extracting which NY Yankees hit 40 or more HRs
+```{r}
+query<-"SELECT playerID,yearID,teamID,HR FROM Batting WHERE teamID='NYA' and HR>=40"
+sqldf(query)
+```
+
+##Strike Outs (SO) & Homeruns(HR)
+More filtering allows extraction of who had over 40 HRs and less than 60 SOs
+
+```{r}
+query<-"SELECT playerID,teamID,yearID,HR,SO FROM Batting WHERE HR>40 and SO<60"
+sqldf(query)
+```
+
+#Filtering the Teams
+Finally for this section, we can filter out the teams to just the Phillies and finding all players in the 1970s who had over 30 HRs
+
+One filters out from the Batting table for the Phillies and the years between 1970 and 1979 for Homeruns greater than 30. 
+
+```{r}
+query<-"SELECT playerID,teamID,yearID,HR FROM Batting WHERE teamID='PHI' and yearID>=1970 and yearID<=1979 and HR>30"
+sqldf(query)
+```
+
+
+```{r}
+query<-"SELECT playerID,yearID,teamID,HR FROM Batting
+WHERE HR>50
+ORDER BY HR DESC"
+
+sqldf(query)
+```
+
+
+```{r}
+query<-"SELECT playerID,yearID,teamID,SO,AB FROM Batting
+WHERE SO<10 and AB>=400 
+ORDER BY SO"
+
+sqldf(query)
+```
+
+
+```{r}
+query<-"SELECT HR FROM Batting
+WHERE playerID= 'ruthba01'"
+
+sqldf(query)
+```
+
+
+```{r}
+query<-"SELECT playerID, sum (HR) FROM Batting
+WHERE playerID='ruthba01'
+GROUP BY playerID"
+
+sqldf(query)
+```
+
+Grouping data by playerID with conditions such as average Homeruns being over 600 using the function HAVING then ORDER BY average Homeruns in descending 
+
+```{r}
+query<-"SELECT playerId, sum(HR) FROM Batting
+GROUP BY playerID
+HAVING sum(HR)>600
+ORDER BY sum(HR) DESC"
+
+
+sqldf(query)
+```
+
+
+Isolating the First Name, Last Name, and Homeruns for Babe Ruth, one of the greats.
+
+```{r}
+query<-"SELECT nameFirst,nameLast,yearID,teamID,HR 
+FROM Batting INNER JOIN Master
+ON Batting.playerID=Master.playerID
+WHERE Batting.playerID='ruthba01'"
+
+sqldf(query)
+```
+
+Here we are joining lists again using the INNER JOIN Function as well as ordering the data by Homeruns in descending order.
+
+```{r}
+query<-"SELECT nameFirst,nameLast,yearID,teamID,HR
+FROM Batting INNER JOIN Master
+ON Batting.playerID=Master.playerID
+WHERE HR>50
+ORDER BY HR DESC"
+
+sqldf(query)
+```
+
+One can isolate the statistics of Babe Ruth through joining various lists and pulling his name from the batting and teams table.
+```{r}
+query<-"SELECT playerID,name,Batting.yearID,Batting.HR
+FROM Batting INNER JOIN Teams
+ON Batting.teamID=Teams.teamID AND Batting.yearID=Teams.yearID
+WHERE playerID='ruthba01'"
+
+sqldf(query)
+```
+
+
+#Joining lists and columns allows for the analyst to find the first and last names of all players named 'Bob' who had an average salary of over 1,000,000 USD
+
+```{r}
+query<-"SELECT nameFirst,nameLast,avg(salary)
+FROM Salaries INNER JOIN Master
+ON Salaries.playerId=Master.playerID
+WHERE nameFirst='Bob'
+GROUP BY Salaries.playerID
+HAVING avg(salary)>1000000
+ORDER BY avg(salary) DESC"
+
+sqldf(query)
+```
+
+```
+
