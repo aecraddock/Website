@@ -1,13 +1,8 @@
 ---
 title: "SQL"
-author: "Adam Craddock"
-date: "December 14, 2017"
-output: html_document
+output: html_notebook
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+## By Adam Craddock
 
 ##Filtering Columns & Rows
 
@@ -46,7 +41,8 @@ query<-"SELECT playerID,teamID,yearID,HR,SO FROM Batting WHERE HR>40 and SO<60"
 sqldf(query)
 ```
 
-#Filtering the Teams
+##FILTERING THE TEAMS
+
 Finally for this section, we can filter out the teams to just the Phillies and finding all players in the 1970s who had over 30 HRs
 
 One filters out from the Batting table for the Phillies and the years between 1970 and 1979 for Homeruns greater than 30. 
@@ -57,6 +53,9 @@ sqldf(query)
 ```
 
 
+#ORDER BY
+
+Here we try to filter out players who hit over 50 homeruns and order them in descending numerical order.
 ```{r}
 query<-"SELECT playerID,yearID,teamID,HR FROM Batting
 WHERE HR>50
@@ -66,6 +65,7 @@ sqldf(query)
 ```
 
 
+Here we are pulling players with less than 10 strikeouts and 400 or more at bats. Then we are ordering them by strikeouts.
 ```{r}
 query<-"SELECT playerID,yearID,teamID,SO,AB FROM Batting
 WHERE SO<10 and AB>=400 
@@ -75,6 +75,7 @@ sqldf(query)
 ```
 
 
+We pulled specific player data for Babe Ruth which includes his homerun career record.
 ```{r}
 query<-"SELECT HR FROM Batting
 WHERE playerID= 'ruthba01'"
@@ -83,6 +84,9 @@ sqldf(query)
 ```
 
 
+##GROUPING
+
+Here we are grouping the sum of Babe Ruth's homerun record over the course of his career to find his total number of homeruns.
 ```{r}
 query<-"SELECT playerID, sum (HR) FROM Batting
 WHERE playerID='ruthba01'
@@ -102,6 +106,10 @@ ORDER BY sum(HR) DESC"
 
 sqldf(query)
 ```
+
+
+
+##JOINING BY
 
 
 Isolating the First Name, Last Name, and Homeruns for Babe Ruth, one of the greats.
@@ -138,7 +146,7 @@ sqldf(query)
 ```
 
 
-#Joining lists and columns allows for the analyst to find the first and last names of all players named 'Bob' who had an average salary of over 1,000,000 USD
+Joining lists and columns allows for the analyst to find the first and last names of all players named 'Bob' who had an average salary of over 1,000,000 USD
 
 ```{r}
 query<-"SELECT nameFirst,nameLast,avg(salary)
@@ -151,6 +159,9 @@ ORDER BY avg(salary) DESC"
 
 sqldf(query)
 ```
+
+```
+
 
 ```
 
